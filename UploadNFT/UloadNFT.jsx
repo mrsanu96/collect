@@ -42,16 +42,28 @@ const UloadNFT = ({ uploadToIPFS, createNFT, uploadToPinata }) => {
     },
     {
       image: images.nft_image_1,
-      category: "Digital",
+      category: "Game",
     },
     {
       image: images.nft_image_2,
-      category: "Time",
+      category: "Comics",
     },
     {
       image: images.nft_image_3,
       category: "Photography",
     },
+    {
+      image: images.nft_image_3,
+      category: "Virtual World",
+    },
+    {
+      image: images.nft_image_3,
+      category: "Utility",
+    },
+    {
+      image: images.nft_image_3,
+      category: "Trading Cards",
+    },   
   ];
 
   return (
@@ -149,7 +161,7 @@ const UloadNFT = ({ uploadToIPFS, createNFT, uploadToPinata }) => {
                     <TiTick />
                   </div>
                 </div>
-                <p>Crypto Legend - {el.category} </p>
+                <p>{el.category} </p>
               </div>
             ))}
           </div>
@@ -220,16 +232,17 @@ const UloadNFT = ({ uploadToIPFS, createNFT, uploadToPinata }) => {
                 price,
                 image,
                 description,
-                router
+                router,
                 // website,
-                // royalties,
+                royalties,
                 // fileSize,
-                // category,
+                category,
                 // properties
               )
             }
             classStyle={Style.upload_box_btn_style}
-          />
+          />{" "}
+          
           <Button
             btnName="Preview"
             handleClick={() => {}}

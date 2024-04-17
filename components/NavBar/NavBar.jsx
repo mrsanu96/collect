@@ -5,7 +5,7 @@ import { DiJqueryLogo } from "react-icons/di";
 import { MdNotifications } from "react-icons/md";
 import { BsSearch } from "react-icons/bs";
 import { CgMenuLeft, CgMenuRight } from "react-icons/cg";
-import Link from "next/link";
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
 
 //INTERNAL IMPORT
@@ -78,9 +78,8 @@ const NavBar = () => {
   };
 
   //SMART CONTRACT SECTION
-  const { currentAccount, connectWallet, openError } = useContext(
-    NFTMarketplaceContext
-  );
+  const { currentAccount, connectWallet, openError, handleConnectWallet } =
+    useContext(NFTMarketplaceContext);
 
   return (
     <div className={Style.navbar}>
@@ -131,12 +130,16 @@ const NavBar = () => {
           {/* CREATE BUTTON SECTION */}
           <div className={Style.navbar_container_right_button}>
             {currentAccount == "" ? (
-              <Button btnName="Connect" handleClick={() => connectWallet()} />
+              <button btnName="Connect" onClick={() => handleConnectWallet()}>
+                Connect{" "}
+              </button>
             ) : (
-              <Button
+              <button
                 btnName="Create"
-                handleClick={() => router.push("/uploadNFT")}
-              />
+                onClick={() => router.push("/uploadNFT")}
+              >
+                Create{" "}
+              </button>
             )}
           </div>
 

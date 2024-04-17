@@ -25,7 +25,7 @@ const searchPage = () => {
       fetchNFTs().then((items) => {
         setNfts(items?.reverse());
         setNftsCopy(items);
-        console.log(nfts);
+        console.log("NFTS", nfts);
       });
       // }
     } catch (error) {
@@ -69,9 +69,9 @@ const searchPage = () => {
         onClearSearch={onClearSearch}
       />
       <Filter />
-      {nfts.length == 0 ? <Loader /> : <NFTCardTwo NFTData={nfts} />}
+      {nfts && nfts.length === 0 ? <Loader /> : <NFTCardTwo NFTData={nfts} />}
       <Slider />
-      <Brand />
+      {/* <Brand /> */}
     </div>
   );
 };

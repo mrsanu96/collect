@@ -23,7 +23,7 @@ import { BiTransferAlt, BiDollar } from "react-icons/bi";
 //INTERNAL IMPORT
 import Style from "./NFTDescription.module.css";
 import images from "../../img";
-import { Button } from "../../components/componentsindex.js";
+import { Button, Loader } from "../../components/componentsindex.js";
 import { NFTTabs } from "../NFTDetailsIndex";
 
 //IMPORT SMART CONTRACT
@@ -35,8 +35,20 @@ const NFTDescription = ({ nft }) => {
   const [history, setHistory] = useState(true);
   const [provanance, setProvanance] = useState(false);
   const [owner, setOwner] = useState(false);
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [nftseller,setNftseller] = useState();
 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchuser = async () => {
+       const user = nft.seller;
+       setNftseller(user)
+
+    }
+    fetchuser();
+  })
 
   const historyArray = [
     images.user1,
@@ -81,18 +93,18 @@ const NFTDescription = ({ nft }) => {
   const openTabs = (e) => {
     const btnText = e.target.innerText;
 
-    if (btnText == "Bid History") {
+    if (btnText === "Bid History") {
       setHistory(true);
       setProvanance(false);
       setOwner(false);
-    } else if (btnText == "Provanance") {
+    } else if (btnText === "Provanance") {
       setHistory(false);
       setProvanance(true);
       setOwner(false);
     }
   };
 
-  const openOwmer = () => {
+  const openOwner = () => {
     if (!owner) {
       setOwner(true);
       setHistory(false);
@@ -103,11 +115,43 @@ const NFTDescription = ({ nft }) => {
     }
   };
 
+
+
+  useEffect(() => {
+    const checkUser = async () => {
+      console.log("User", nftseller)
+      try {
+        // Fetch user details from MongoDB using wallet address
+        const response = await fetch(`/api/getUserData?walletAddress=${nftseller.toLowerCase()}`);
+        const userData = await response.json();
+
+        // Extract username from user data
+        console.log("1", userData.username)
+
+        // Update the state with the username
+        setUsername(userData.username);
+        setLoading(false); // Set loading to false when data fetching is complete
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Handle error
+      }
+    }
+
+    checkUser();
+
+    // const intervalId = setInterval(checkUser, 5000); // Fetch data every 2 seconds
+
+    // return () => clearInterval(intervalId); // Cleanup function to clear interval
+  }, [nftseller]);
+
   //SMART CONTRACT DATA
   const { buyNFT, currentAccount } = useContext(NFTMarketplaceContext);
 
   return (
     <div className={Style.NFTDescription}>
+       {loading ? (
+        <div><Loader /> </div>
+      ) : (
       <div className={Style.NFTDescription_box}>
         {/* //Part ONE */}
         <div className={Style.NFTDescription_box_share}>
@@ -121,10 +165,10 @@ const NFTDescription = ({ nft }) => {
             {social && (
               <div className={Style.NFTDescription_box_share_box_social}>
                 <a href="#">
-                  <TiSocialFacebook /> Facebooke
+                  <TiSocialFacebook /> Facebook
                 </a>
                 <a href="#">
-                  <TiSocialInstagram /> Instragram
+                  <TiSocialInstagram /> Instagram
                 </a>
                 <a href="#">
                   <TiSocialLinkedin /> LinkedIn
@@ -152,7 +196,7 @@ const NFTDescription = ({ nft }) => {
                   <BiTransferAlt /> Transfer
                 </a>
                 <a href="#">
-                  <MdReportProblem /> Report abouse
+                  <MdReportProblem /> Report abuse
                 </a>
                 <a href="#">
                   <MdOutlineDeleteSweep /> Delete item
@@ -178,9 +222,9 @@ const NFTDescription = ({ nft }) => {
               <div className={Style.NFTDescription_box_profile_box_left_info}>
                 <small>Creator</small> <br />
                 {/* <Link href={{ pathname: "/author", query: `${nft.seller}` }}> */}
-                <Link href={{ pathname: "/author" }}>
+                <Link href={{ pathname: "/creator", query: { walletAddress: nft.seller.toLowerCase() } }}>
                   <span>
-                    Karli Costa <MdVerified />
+                    {username} <MdVerified />
                   </span>
                 </Link>
               </div>
@@ -260,9 +304,9 @@ const NFTDescription = ({ nft }) => {
             </div>
 
             <div className={Style.NFTDescription_box_profile_biding_box_button}>
-              {currentAccount == nft.seller.toLowerCase() ? (
+              {currentAccount === nft.seller.toLowerCase() ? (
                 <p>You can't buy your own NFT</p>
-              ) : currentAccount == nft.owner.toLowerCase() ? (
+              ) : currentAccount === nft.owner.toLowerCase() ? (
                 <Button
                   icon={<FaWallet />}
                   btnName="List on Marketplace"
@@ -292,8 +336,8 @@ const NFTDescription = ({ nft }) => {
 
             <div className={Style.NFTDescription_box_profile_biding_box_tabs}>
               <button onClick={(e) => openTabs(e)}>Bid History</button>
-              <button onClick={(e) => openTabs(e)}>Provanance</button>
-              <button onClick={() => openOwmer()}>Owner</button>
+              <button onClick={(e) => openTabs(e)}>Provenance</button>
+              <button onClick={() => openOwner()}>Owner</button>
             </div>
 
             {history && (
@@ -315,7 +359,10 @@ const NFTDescription = ({ nft }) => {
           </div>
         </div>
       </div>
+      )
+            }  
     </div>
+    
   );
 };
 

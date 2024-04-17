@@ -25,12 +25,12 @@ import { getTopCreators } from "../TopCreators/TopCreators";
 import { NFTMarketplaceContext } from "../Context/NFTMarketplaceContext";
 
 const Home = () => {
-  const { checkIfWalletConnected, currentAccount } = useContext(
-    NFTMarketplaceContext
-  );
-  useEffect(() => {
-    checkIfWalletConnected();
-  }, []);
+  // const { checkIfWalletConnected, currentAccount } = useContext(
+  //   NFTMarketplaceContext
+  // );
+  // useEffect(() => {
+  //   checkIfWalletConnected();
+  // }, []);
 
   const { fetchNFTs } = useContext(NFTMarketplaceContext);
   const [nfts, setNfts] = useState([]);
@@ -39,8 +39,10 @@ const Home = () => {
   useEffect(() => {
     // if (currentAccount) {
     fetchNFTs().then((items) => {
-      console.log(nfts);
-      setNfts(items?.reverse());
+      if(items && items.length > 0){
+         setNfts(items?.reverse());
+      }
+    
       setNftsCopy(items);
     });
     // }

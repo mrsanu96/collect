@@ -15,12 +15,18 @@ import {
 import { BsThreeDots } from "react-icons/bs";
 
 //INTERNAL IMPORT
-import Style from "./AuthorProfileCard.module.css";
-import images from "../../img";
-import { Button } from "../../components/componentsindex.js";
+import Style from "./CreateProfileCard.module.css";
+import images from "../../img/index.js";
+import { Button, Loader } from "../../components/componentsindex.js";
+import FollowButton from "../../components/Follow/Follower.js"
 import axios from "axios";
 
-const AuthorProfileCard = ({ currentAccount }) => {
+const CreateProfileCard = ({ currentAccount }) => {
+  console.log("seller1", currentAccount);
+  const [userId, setUserId] = useState();
+  const [followUserId, setFollowUserId] = useState();
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -31,6 +37,7 @@ const AuthorProfileCard = ({ currentAccount }) => {
     instagram: "",
     walletAddress: "",
   });
+
 
   const [share, setShare] = useState(false);
   const [report, setReport] = useState(false);
@@ -43,51 +50,38 @@ const AuthorProfileCard = ({ currentAccount }) => {
     navigator.clipboard.writeText(copyText.value);
   };
 
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
+
+  
   useEffect(() => {
     const checkWalletConnection = async () => {
-      if (window.ethereum && window.ethereum.selectedAddress) {
-        setIsWalletConnected(true);
-        setFormData((prevState) => ({
-          ...prevState,
-          walletAddress: window.ethereum.selectedAddress,
-        }));
 
-        // Fetch user details from MongoDB
+      if (currentAccount) {
         const response = await fetch(
+          `/api/getUserData?walletAddress=${currentAccount}`
+        );
+
+        const response2 = await fetch(
           `/api/getUserData?walletAddress=${window.ethereum.selectedAddress}`
         );
         const userData = await response.json();
+        const connectUserData = await response2.json();
+        console.log("objectId", userData._id)
+        console.log("objectId2", connectUserData._id)
 
-        if (response.ok) {
-          setFormData({
-            ...formData,
-            username: userData.username || "",
-            email: userData.email || "",
-            description: userData.description || "",
-            website: userData.website || "",
-            facebook: userData.facebook || "",
-            twitter: userData.twitter || "",
-            instagram: userData.instagram || "",
-            walletAddress: userData.walletAddress || "",
-          });
-        } else {
-          console.error("Failed to fetch user data:", userData.error);
+        if (response.ok && response2.ok) {
+          setUsername(userData.username);
+          setUserId(userData._id)
+          setFollowUserId(connectUserData._id)
+          setLoading(false);        
+        
         }
-      } else {
-        setIsWalletConnected(false);
+        
       }
     };
     checkWalletConnection();
-
-    // Listen for changes in wallet connection
-    window.ethereum.on("accountsChanged", checkWalletConnection);
-
-    return () => {
-      // Cleanup listener
-      window.ethereum.removeListener("accountsChanged", checkWalletConnection);
-    };
-  }, []);
+  
+  }, [currentAccount]);
 
   const openShare = () => {
     if (!share) {
@@ -109,6 +103,9 @@ const AuthorProfileCard = ({ currentAccount }) => {
 
   return (
     <div className={Style.AuthorProfileCard}>
+         {loading ? (
+        <div><Loader /> </div>
+      ) : (
       <div className={Style.AuthorProfileCard_box}>
         <div className={Style.AuthorProfileCard_box_img}>
           <Image
@@ -122,7 +119,7 @@ const AuthorProfileCard = ({ currentAccount }) => {
 
         <div className={Style.AuthorProfileCard_box_info}>
           <h2>
-            {formData.username}
+            {username}
             {""}{" "}
             <span>
               <MdVerified />
@@ -156,7 +153,8 @@ const AuthorProfileCard = ({ currentAccount }) => {
         </div>
 
         <div className={Style.AuthorProfileCard_box_share}>
-          <Button btnName="Follow" handleClick={() => {}} />
+          
+        { userId !== followUserId && (<FollowButton userId={userId} followUserId={followUserId} />) }
           <MdCloudUpload
             onClick={() => openShare()}
             className={Style.AuthorProfileCard_box_share_icon}
@@ -211,8 +209,9 @@ const AuthorProfileCard = ({ currentAccount }) => {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };
 
-export default AuthorProfileCard;
+export default CreateProfileCard;

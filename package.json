@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "export": "next build && next export",
     "lint": "next lint"
   },
   "dependencies": {
@@ -14,6 +15,8 @@
     "ether": "^0.0.9",
     "framer-motion": "^7.2.1",
     "ipfs-http-client": "^58.0.0",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.2.3",
     "next": "12.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
